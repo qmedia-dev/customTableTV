@@ -1,0 +1,17 @@
+.custom-table {
+    width: 100%;
+}
+
+.custom-table td {
+    vertical-align: middle;
+    white-space: nowrap;
+    min-width: 100px;
+    border: 5px solid #f9f9f9;
+    padding: 0;
+    width: auto;
+}
+
+.custom-table .title {
+    background-color: #ececec;
+    padding: 0.46153846em 0.5em;
+}
