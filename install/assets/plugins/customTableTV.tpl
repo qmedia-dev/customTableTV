@@ -13,8 +13,8 @@
  * @internal    @installset base
  */
 
-$_CTTV_BASE = 'assets/plugins/customtabletv/';
+$_CTTV_BASE = 'assets/plugins/customtvtable/';
 
 $_CTTV_URL = MODX_SITE_URL . $_CTTV_BASE;
 
-require(MODX_BASE_PATH. $_CTTV_BASE .'customtabletv.plugin.php');
+require(MODX_BASE_PATH. $_CTTV_BASE .'customtvtable.plugin.php');
