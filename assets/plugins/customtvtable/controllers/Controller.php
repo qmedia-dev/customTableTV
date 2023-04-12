@@ -29,13 +29,14 @@ class Controller
      */
     private function __construct()
     {
-        $this->path = evo()->getConfig().'assets/plugins/customtabletv/';
+        $this->path = __DIR__."/../";
+        $this->path = str_replace(evo()->getConfig('base_path'), "", $this->path);
     }
 
     /**
      * @return Controller
      */
-    public static function getInstance() : object
+    public static function getInstance(): object
     {
         if (self::$_instance === null) {
             self::$_instance = new self;
@@ -61,17 +62,17 @@ class Controller
     }
 
     /**
-     * @param array $config
+     * @param  array  $config
      * @return object
      */
-    public function setConfig(array $config = []) : object
+    public function setConfig(array $config = []): object
     {
-        if(!empty($config)) {
+        if (!empty($config)) {
             foreach ($config as $item_key => $item) {
-                if(!empty($item->rows)) {
+                if (!empty($item->rows)) {
                     $item->rows = $this->processConfigPrepares(trim($item->rows));
                 }
-                if(!empty($item->columns)) {
+                if (!empty($item->columns)) {
                     $item->columns = $this->processConfigPrepares(trim($item->columns));
                 }
 
@@ -84,16 +85,18 @@ class Controller
     }
 
     /**
-     * @param string $prepare
+     * @param  string  $prepare
      * @return array
      */
-    protected function processConfigPrepares(string $prepare) : array
+    protected function processConfigPrepares(string $prepare): array
     {
         $result = [];
-        if(!empty($prepare)) {
-            if(strpos($prepare, ',') === false) {
+        if (!empty($prepare)) {
+            if (strpos($prepare, ',') === false) {
                 $result = evo()->runSnippet($prepare);
-                if(empty($result)) return [];
+                if (empty($result)) {
+                    return [];
+                }
             }
         }
 
@@ -103,7 +106,7 @@ class Controller
     /**
      * @return object
      */
-    public function run() : object
+    public function run(): object
     {
         $this->data = [
             '<!-- customTabletV -->',
@@ -117,10 +120,10 @@ class Controller
     }
 
     /**
-     * @param string $separator
+     * @param  string  $separator
      * @return string
      */
-    public function toString(string $separator = '') : string
+    public function toString(string $separator = ''): string
     {
         return implode('', $this->data);
     }
