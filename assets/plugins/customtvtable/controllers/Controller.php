@@ -2,6 +2,9 @@
 
 namespace EvolutionCMS\Plugins\CustomTable;
 
+use EvolutionCMS\Gateway\Helpers\CustomTableHelper;
+use EvolutionCMS\Gateway\Models\Evo\SiteContent;
+
 class Controller
 {
     /**
@@ -29,7 +32,7 @@ class Controller
      */
     private function __construct()
     {
-        $this->path = __DIR__."/../";
+        $this->path = __DIR__ . "/../";
         $this->path = str_replace(evo()->getConfig('base_path'), "", $this->path);
     }
 
@@ -50,53 +53,58 @@ class Controller
      */
     private function __clone()
     {
-
     }
 
     /**
      * @return void
      */
-    private function __wakeup()
+    public function __wakeup()
     {
-
     }
 
     /**
-     * @param  array  $config
+     * @param int $docId
+     * @param array $config
      * @return object
      */
-    public function setConfig(array $config = []): object
+    public function setConfig(int $docId, array $config = []): object
     {
         if (!empty($config)) {
             foreach ($config as $item_key => $item) {
-                if (!empty($item->rows)) {
-                    $item->rows = $this->processConfigPrepares(trim($item->rows));
-                }
-                if (!empty($item->columns)) {
-                    $item->columns = $this->processConfigPrepares(trim($item->columns));
-                }
+                $docHasTv = !empty($item->tvId);
 
-                $config[$item_key] = $item;
+                if ($docHasTv) {
+                    if (!empty($item->rows)) {
+                        $item->rows = $this->processConfigPrepares(trim($item->rows), $docId);
+                    }
+
+                    if (!empty($item->columns)) {
+                        $item->columns = $this->processConfigPrepares(trim($item->columns), $docId);
+                    }
+
+                    $config[$item_key] = $item;
+                }
             }
         }
+
         $this->config = $config;
 
         return $this;
     }
 
     /**
-     * @param  string  $prepare
+     * @param string $prepare
+     * @param int $docId
      * @return array
      */
-    protected function processConfigPrepares(string $prepare): array
+    protected function processConfigPrepares(string $prepare, int $docId): array
     {
         $result = [];
+        $parentId = $_REQUEST['pid'] ?? 0;
         if (!empty($prepare)) {
             if (strpos($prepare, ',') === false) {
-                $result = evo()->runSnippet($prepare);
-                if (empty($result)) {
-                    return [];
-                }
+                $result = CustomTableHelper::$prepare($docId, $parentId);
+                if (empty($result)) return [];
             }
         }
 
@@ -110,9 +118,9 @@ class Controller
     {
         $this->data = [
             '<!-- customTabletV -->',
-            '<link rel="stylesheet" href="/'.$this->path.'styles.css">',
-            '<script>let settings = '.json_encode($this->config).';</script>',
-            '<script src="/'.$this->path.'scripts.js"></script>',
+            '<link rel="stylesheet" href="/' . $this->path . 'styles.css">',
+            '<script>let settings = ' . json_encode($this->config) . ';</script>',
+            '<script src="/' . $this->path . 'scripts.js"></script>',
             '<!-- /customTabletV -->',
         ];
 
@@ -120,7 +128,7 @@ class Controller
     }
 
     /**
-     * @param  string  $separator
+     * @param string $separator
      * @return string
      */
     public function toString(string $separator = ''): string
